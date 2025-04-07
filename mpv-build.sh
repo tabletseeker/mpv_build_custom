@@ -32,7 +32,7 @@ cd zimg
 ./autogen.sh
 ./configure --prefix=${INSTALL_PATH} --libdir=${LIBRARY_INSTALL_DIR}
 make -j4
-make install
+sudo make install
 
 cd ..
 
@@ -41,18 +41,18 @@ cd vapoursynth
 ./autogen.sh
 ./configure --prefix=${INSTALL_PATH} --libdir=${LIBRARY_INSTALL_DIR}
 make -j4
-make install
+sudo make install
 
 cd ..
 
-ldconfig
+sudo ldconfig
 
-ln -s /usr/local/lib/python3.11/site-packages/vapoursynth.so /usr/lib/python3.11/lib-dynload/vapoursynth.so
+sudo ln -s /usr/local/lib/python3.11/site-packages/vapoursynth.so /usr/lib/python3.11/lib-dynload/vapoursynth.so
 
 ${GIT_SCRIPT} -c -t tag -r FFmpeg/nv-codec-headers
 cd nv-codec-headers
 make -j4
-make install DESTDIR=${INSTALL_PATH}
+sudo make install
 
 cd ..
 
@@ -96,4 +96,4 @@ mk-build-deps -s sudo -i
 ./rebuild -j4
 
 #dpkg-buildpackage -uc -us -b -j4
-#./install
+#sudo ./install
