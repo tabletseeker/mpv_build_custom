@@ -14,9 +14,9 @@ sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -o
 	libssl-dev libfribidi-dev libluajit-5.1-dev libx264-dev xorg-dev libegl1-mesa-dev \
 	libfreetype-dev libfontconfig-dev libasound2-dev libpulse-dev python-is-python3 libx264-dev\
 	libmp3lame-dev libfdk-aac-dev git autoconf automake build-essential libass-dev \
-        libfreetype6-dev libgpac-dev libsdl1.2-dev libtheora-dev libtool libva-dev \
+        libfreetype6-dev libsdl1.2-dev libtheora-dev libtool libva-dev \
         libvdpau-dev libvorbis-dev libxcb1-dev libxcb-shm0-dev libxcb-xfixes0-dev \
-        libqt5x11extras5-dev libxcb-xinerama0-dev libvlc-dev libv4l-dev beignet-opencl-icd \
+        libqt5x11extras5-dev libxcb-xinerama0-dev libvlc-dev libv4l-dev \
         pkg-config texi2html zlib1g-dev cmake libcurl4-openssl-dev clang ocl-icd-opencl-dev \
         libjack-jackd2-dev libxcomposite-dev x11proto-dev libc++-dev \
         libx264-dev libgl1-mesa-dev libglu1-mesa-dev libasound2-dev \
@@ -24,7 +24,7 @@ sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -o
         libxi-dev qttools5-dev qt5-qmake qtbase5-dev libffmpeg-nvenc-dev \
         libharfbuzz-dev libxpresent-dev libdrm-dev libplacebo-dev meson \
 	libfftw3-dev libpng-dev libsndfile1-dev libxvidcore-dev libbluray-dev \
-	libopencv-dev ocl-icd-libopencl1 opencl-headers \
+	libopencv-dev ocl-icd-libopencl1 opencl-headers directx-headers-dev \
 	libboost-filesystem-dev libboost-system-dev libx265-dev
 
 ${GIT_SCRIPT} -c -t tag -r sekrit-twc/zimg
@@ -61,8 +61,6 @@ ${GIT_SCRIPT} -c -t master -r mpv-player/mpv-build
 cd mpv-build
 
 cat > mpv_options << EOF
--Dprefix=${INSTALL_PATH}
--Dlibdir=${LIBRARY_INSTALL_DIR}
 -Dvapoursynth=enabled
 -Dlibmpv=true
 -Dvulkan=enabled
