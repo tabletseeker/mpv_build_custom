@@ -4,6 +4,7 @@ INSTALL_PATH=/usr/local
 LIBRARY_INSTALL_DIR=${INSTALL_PATH}/lib
 SOURCE_DIR=$(find ${PWD%${PWD#/*/}} -type d -name "mpv_custom_build" | head -1)
 GIT_SCRIPT="${SOURCE_DIR}/git.sh"
+PYTHON_VER="3.13"
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin"
 export PKG_CONFIG_PATH="${LIBRARY_INSTALL_DIR}/pkgconfig"
 export NOCONFIGURE=1
@@ -46,8 +47,9 @@ sudo make install
 cd ..
 
 sudo ldconfig
-
-sudo ln -s /usr/local/lib/python3.11/site-packages/vapoursynth.so /usr/lib/python3.11/lib-dynload/vapoursynth.so
+mkdir -p ~/.local/lib/python${PYTHON_VER}/site-packages
+sudo ln -s /usr/local/lib/python${PYTHON_VER}/site-packages/vapoursynth.so /usr/lib/python3.11/lib-dynload/vapoursynth.so
+ln -s /usr/local/lib/python${PYTHON_VER}/site-packages ~/.local/lib/python${PYTHON_VER}/site-packages
 
 ${GIT_SCRIPT} -c -t tag -r FFmpeg/nv-codec-headers
 cd nv-codec-headers
