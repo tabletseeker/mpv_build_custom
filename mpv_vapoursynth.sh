@@ -26,7 +26,7 @@ sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -o
         libharfbuzz-dev libxpresent-dev libdrm-dev libplacebo-dev meson \
 	libfftw3-dev libpng-dev libsndfile1-dev libxvidcore-dev libbluray-dev \
 	libopencv-dev ocl-icd-libopencl1 opencl-headers directx-headers-dev \
-	libboost-filesystem-dev libboost-system-dev libx265-dev
+	libboost-filesystem-dev libboost-system-dev libx265-dev libarchive-tools wget curl jq git
 
 ${GIT_SCRIPT} -c -t tag -r sekrit-twc/zimg
 cd zimg
