@@ -93,7 +93,7 @@ EOF
 
 mk-build-deps -s sudo -i
 
-./rebuild -j4
+./rebuild -j4 | tee build.log
 
 #dpkg-buildpackage -uc -us -b -j4
 #sudo ./install
