@@ -2,12 +2,108 @@
 
 INSTALL_PATH=/usr/local
 LIBRARY_INSTALL_DIR=${INSTALL_PATH}/lib
-SOURCE_DIR=$(find ${PWD%${PWD#/*/}} -type d -name "mpv_custom_build" | head -1)
-GIT_SCRIPT="${SOURCE_DIR}/git.sh"
 PYTHON_VER="3.13"
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin"
 export PKG_CONFIG_PATH="${LIBRARY_INSTALL_DIR}/pkgconfig"
 export NOCONFIGURE=1
+
+get_latest_git() {
+
+unset CLONE GET TYPE TARGET REPO
+
+while [[ $# -gt 0 ]]; do
+
+	case ${1} in
+
+		-w|--wget)
+		GET=1
+		case ${2} in
+
+			*zip*)
+			TARGET="zipball_url"
+			EXT=".zip"
+			shift
+			;;
+			
+			*tar*)
+			TARGET="tarball_url"
+			EXT=".tar.gz"
+			shift
+			;;
+		esac
+		shift
+		;;
+		
+		-r|--repo)
+		REPO=${2}
+		shift
+		shift
+		;;
+		
+		-t|--type)
+		case ${2} in
+		
+			*rel*)
+			TYPE="releases"
+			shift
+			;;
+			
+			*tag*)
+			TYPE="tags"
+			shift
+			;;
+			
+			master)
+			TYPE="master"
+			shift
+			;;
+		esac
+		shift
+		;;
+		
+		-v|--version)
+		VERSION=${2}
+		shift
+		shift
+		;;
+		
+		-c|--clone)
+		CLONE=1
+		TARGET="name"
+		shift
+		;;
+		
+		-*|--*)
+		echo "Unknown option $1"
+		exit 1
+		;;
+		
+		*)
+		CUSTOM_ARGS+=("$1")
+		shift
+		;;
+
+	esac
+
+done
+
+[[ -n ${CLONE} && -z ${TYPE} ]] && TYPE="master"
+[[ -z ${TARGET} || -z ${REPO} || -z ${TYPE} ]] && { echo "missing options!"; exit 1 ; }
+[[ -n ${CLONE} && -n ${GET} ]] && { echo "choose between cloning or wget!"; exit 1 ; }
+
+GIT_URL="https://github.com/${REPO}"
+API_URL="https://api.github.com/repos/${REPO}/${TYPE}"
+ARCHIVE="${REPO#*/}${EXT}"
+OUTPUT=${ARCHIVE%%.*}
+
+[ ${TYPE} = master ] && BRANCH="master" || \
+BRANCH=$(curl -s ${API_URL} | jq '.[]' | jq -r ".${TARGET}" | grep -Pm1 "${VERSION}")
+
+[ ${TARGET} = name ] && \
+{ git clone ${GIT_URL} --branch ${BRANCH} ${ARCHIVE} || exit 1; } || { wget ${BRANCH} -O ${ARCHIVE} && \
+{ mkdir -p ${REPO#*/}; bsdtar -xvf ${ARCHIVE} -C ${OUTPUT} --strip-components 1; } || exit 1; }
+
+}
 
 sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
 	build-essential yasm intltool autoconf libtool devscripts equivs libavutil-dev \
@@ -26,17 +122,17 @@ sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -o
         libharfbuzz-dev libxpresent-dev libdrm-dev libplacebo-dev meson \
 	libfftw3-dev libpng-dev libsndfile1-dev libxvidcore-dev libbluray-dev \
 	libopencv-dev ocl-icd-libopencl1 opencl-headers directx-headers-dev \
-	libboost-filesystem-dev libboost-system-dev libx265-dev
+	libboost-filesystem-dev libboost-system-dev libx265-dev libarchive-tools wget curl jq git
 
 # build nvenc headers
-${GIT_SCRIPT} -c -t tag -r FFmpeg/nv-codec-headers
+get_latest_git -c -t tag -r FFmpeg/nv-codec-headers
 cd nv-codec-headers
 make -j4
 sudo make install
 
 cd ..
 
-${GIT_SCRIPT} -c -t master -r mpv-player/mpv-build
+get_latest_git -c -t master -r mpv-player/mpv-build
 
 cd mpv-build
 
@@ -69,7 +165,7 @@ EOF
 
 mk-build-deps -s sudo -i
 
-./rebuild -j4
+./rebuild -j4 | tee ${PWD%${PWD#/*/}}mpv_build.log
 
 # build .deb package
 #dpkg-buildpackage -uc -us -b -j4
