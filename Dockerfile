@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y apt-transport-https ca-certificates && 
 	-o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libarchive-tools wget curl jq git sudo && \
 	chmod +x /mpv-common.sh && ./mpv-common.sh | tee build.log
 	
-FROM debian:trixie AS baseimage2
+FROM debian:trixie-slim AS installimage
 
 USER root
 
@@ -18,3 +18,10 @@ COPY --from=baseimage /mpv_*.deb /tmp
 
 RUN sed -i '0,/main/s//main contrib non-free non-free-firmware\n&/' /etc/apt/sources.list.d/debian.sources && \
 	apt update && dpkg -i /tmp/*.deb; apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -f -y --no-install-recommends 
+
+FROM debian:trixie-slim
+
+COPY --from=installimage /usr/bin/mpv /usr/bin/mpv
+COPY --from=installimage /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
+
+USER mpv
