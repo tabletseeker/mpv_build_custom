@@ -163,11 +163,13 @@ EOF
 
 ./update
 
-mk-build-deps -s sudo -i
+echo yes | mk-build-deps -s sudo -i
 
-./rebuild -j4 | tee ${PWD%${PWD#/*/}}mpv_build.log
+sleep 1
 
+dpkg-buildpackage -uc -us -b -j12
+
+# local build
+#./rebuild -j12 | tee ${PWD%${PWD#/*/}}mpv_build.log
+# sudo ./install
 # build .deb package
-#dpkg-buildpackage -uc -us -b -j4
-
-sudo ./install
