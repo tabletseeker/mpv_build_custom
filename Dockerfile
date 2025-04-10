@@ -24,4 +24,4 @@ FROM debian:trixie-slim
 COPY --from=installimage /usr/bin/mpv /usr/bin/mpv
 COPY --from=installimage /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
 
-USER mpv
+USER root
